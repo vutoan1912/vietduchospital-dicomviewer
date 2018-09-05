@@ -1,0 +1,55 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+// ------------------------------------------ toanvd ---------------------------------------
+
+function getParameterByName(name, url) {
+	if (!url) url = window.location.href;
+	name = name.replace(/[\[\]]/g, '\\$&');
+	var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+		results = regex.exec(url);
+	if (!results) return null;
+	if (!results[2]) return '';
+	return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+// function httpGetAsync(theUrl, callback)
+// {
+//     var xmlHttp = new XMLHttpRequest();
+//     xmlHttp.onreadystatechange = function() {
+//         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+//             callback(xmlHttp.responseText);
+//     }
+//     xmlHttp.open("GET", theUrl, true); // true for asynchronous
+//     xmlHttp.send(null);
+// }
+
+var id = getParameterByName('id');
+var token = getParameterByName('token');
+
+console.log(id);
+console.log(token);
+
+$.ajax({
+	type : "GET",
+	url : "http://localhost:9115/api/files/get-series-images?series=" + id,
+	beforeSend: function(xhr){xhr.setRequestHeader('AuthorizationBack', 'Bearer ' + token);},
+	success : function(result) {
+		//set your variable to the result
+		console.log(result);
+
+		//build files
+		var listFile = [];
+		var str = "";
+		result.files.forEach(function(element) {
+			//console.log(element);
+			str = result.url + result.folder + "/" + element;
+			listFile.push(str);
+		});
+		console.log(listFile);
+		self.loadURLs(listFile);
+	},
+	error : function(result) {
+		//handle the error
+		console.log(result);
+	}
+});
